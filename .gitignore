@@ -1,0 +1,10 @@
+*.exe
+*.log
+.idea
+*.gz
+*.out
+*.svg
+__pycache__/
+venv/
+.env
+.vscode/launch.json
