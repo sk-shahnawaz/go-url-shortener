@@ -50,12 +50,13 @@ func main() {
 	linkGenerationRoute_Generator := apiGrouping.POST("/generate", handlers.GenerateShortenedUrl)
 	linkGenerationRoute_Generator.Name = "Generator"
 
-	linkGenerationRoute_Resolver := apiGrouping.GET("/resolver", handlers.ResolveShortenedUrl)
+	linkGenerationRoute_Resolver := apiGrouping.GET("/resolve", handlers.ResolveShortenedUrl)
 	linkGenerationRoute_Resolver.Name = "Resolver"
 
 	var portNumber int64 = 80
 	if portNumberInt := utilities.ReadEnvironmentVariable("CUSTOM_PORT_NUMBER", reflect.Int32, "80"); portNumberInt.(int64) > 0 {
 		portNumber = portNumberInt.(int64)
 	}
+
 	app.Logger.Fatal(app.Start(fmt.Sprintf(":%d", portNumber)))
 }

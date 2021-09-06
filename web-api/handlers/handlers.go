@@ -61,6 +61,13 @@ func GenerateShortenedUrl(context echo.Context) error {
 			return context.JSON(http.StatusBadRequest, "Bad request received.")
 		}
 	}
+	if err := input.Validate(); err != nil {
+		log.WithFields(log.Fields{
+			"status":     http.StatusInternalServerError,
+			"stackTrace": string(err.Error()),
+		}).Error()
+		return context.JSON(http.StatusInternalServerError, err)
+	}
 	shortnedLink, err := utilities.GenerateShortLink(input.Url)
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -74,7 +81,7 @@ func GenerateShortenedUrl(context echo.Context) error {
 		"originalUrl":  input.Url,
 		"shortenedUrl": shortnedLink,
 	}).Debug()
-	return context.String(http.StatusOK, fmt.Sprint("http://", context.Request().Host, "/api/resolver", "?q=", shortnedLink))
+	return context.String(http.StatusOK, fmt.Sprint("http://", context.Request().Host, "/api/resolve", "?q=", shortnedLink))
 }
 
 func ResolveShortenedUrl(context echo.Context) error {
@@ -93,11 +100,12 @@ func ResolveShortenedUrl(context echo.Context) error {
 		"name":   "Resolve Shortened URL",
 	}).Info()
 	queryParameterValue := context.QueryParam("q")
-	if queryParameterValue == "" {
+	if err := dto.Validate(queryParameterValue); err != nil {
 		log.WithFields(log.Fields{
 			"status":  http.StatusBadRequest,
-			"message": "Query parameter missing",
-		}).Debug()
+			"message": err,
+		}).Error()
+		return context.JSON(http.StatusInternalServerError, "Query string missing.")
 	}
 	resolvedLink, err := utilities.ResolveShortenedLink(queryParameterValue)
 	if err != nil {
