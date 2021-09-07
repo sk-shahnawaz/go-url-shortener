@@ -8,6 +8,5 @@
 ## TODO
 - HTTPS support
 - Add Open API Swagger Documentation 
-- Add persistance (preferably PostgreSQL)
 - Dockerization
 - GitHub actions

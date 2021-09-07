@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"gourlshortener/utilities"
 	"gourlshortener/web-api/dto"
+	"gourlshortener/web-api/models"
 	"net/http"
 	"runtime/debug"
 
@@ -68,7 +69,7 @@ func GenerateShortenedUrl(context echo.Context) error {
 		}).Error()
 		return context.JSON(http.StatusInternalServerError, err)
 	}
-	shortnedLink, err := utilities.GenerateShortLink(input.Url)
+	shortnedLink, err := utilities.GenerateShortLink(input.Url, context.(models.ExtendedContext).Db)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"status":     http.StatusInternalServerError,
@@ -107,7 +108,7 @@ func ResolveShortenedUrl(context echo.Context) error {
 		}).Error()
 		return context.JSON(http.StatusInternalServerError, "Query string missing.")
 	}
-	resolvedLink, err := utilities.ResolveShortenedLink(queryParameterValue)
+	resolvedLink, err := utilities.ResolveShortenedLink(queryParameterValue, context.(models.ExtendedContext).Db)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"status":     http.StatusInternalServerError,
