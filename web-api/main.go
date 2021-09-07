@@ -2,12 +2,16 @@ package main
 
 import (
 	"fmt"
+	"gourlshortener/db"
 	"gourlshortener/utilities"
 	"gourlshortener/web-api/handlers"
+	"gourlshortener/web-api/models"
 	"net/http"
 	"os"
 	"reflect"
+	"strings"
 
+	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -15,6 +19,14 @@ import (
 )
 
 func main() {
+	var dbClient *pgxpool.Pool
+	var err error
+	defer func() {
+		if dbClient != nil {
+			db.Disconnect(dbClient)
+		}
+	}()
+
 	godotenv.Load()
 	app := echo.New()
 
@@ -28,6 +40,14 @@ func main() {
 		}
 		log.SetOutput(os.Stdout)
 	}(fmt.Sprintf("%v", minimumLogLevel))
+
+	if useInMemoryDb := utilities.ReadEnvironmentVariable("USE_IN_MEMORY_DB", reflect.String, "Y"); strings.ToUpper(useInMemoryDb.(string)) == "N" {
+		dbClient, err = db.Connect()
+		if err != nil {
+			log.Error("Failed to connect to database")
+			os.Exit(1)
+		}
+	}
 
 	app.Use(middleware.Recover())
 	app.Use(middleware.RemoveTrailingSlash())
@@ -47,6 +67,14 @@ func main() {
 	}).Name = "Health"
 
 	apiGrouping := app.Group("/api")
+
+	apiGrouping.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			extendedContext := models.ExtendedContext{Context: c, Db: dbClient}
+			return next(extendedContext)
+		}
+	})
+
 	linkGenerationRoute_Generator := apiGrouping.POST("/generate", handlers.GenerateShortenedUrl)
 	linkGenerationRoute_Generator.Name = "Generator"
 

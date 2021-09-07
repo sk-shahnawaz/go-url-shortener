@@ -1,6 +1,7 @@
 package utilities
 
 import (
+	"context"
 	"crypto/sha256"
 	"errors"
 	"fmt"
@@ -8,8 +9,10 @@ import (
 	"os"
 	"reflect"
 	"strconv"
+	"strings"
 
 	base58 "github.com/itchyny/base58-go"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 var store map[string]string = make(map[string]string)
@@ -22,7 +25,7 @@ func ReadEnvironmentVariable(variableName string, valueType reflect.Kind, defaul
 		} else if valueType == reflect.Int64 {
 			value = parseStringToInteger(envVariableValue, 10, 64)
 		} else {
-			value = defaultValue
+			value = envVariableValue
 		}
 	} else {
 		value = defaultValue
@@ -55,27 +58,50 @@ func base58Encoded(bytes []byte) (string, error) {
 	return string(encoded), nil
 }
 
-func GenerateShortLink(link string) (string, error) {
-	shortenedLink, present := store[link]
-	if !present {
-		urlHashBytes := sha256encoded([]byte(link))
-		generatedNumber := new(big.Int).SetBytes(urlHashBytes).Uint64()
-		finalString, error := base58Encoded([]byte(fmt.Sprintf("%d", generatedNumber)))
-		if error != nil {
-			return "", error
-		}
-		store[link] = finalString[:8]
-		return finalString[:8], nil
-	} else {
-		return shortenedLink, nil
+func GenerateShortLink(link string, dbClient *pgxpool.Pool) (string, error) {
+	urlHashBytes := sha256encoded([]byte(link))
+	generatedNumber := new(big.Int).SetBytes(urlHashBytes).Uint64()
+	finalString, error := base58Encoded([]byte(fmt.Sprintf("%d", generatedNumber)))
+	if error != nil {
+		return "", error
 	}
+	if useInMemoryDb := ReadEnvironmentVariable("USE_IN_MEMORY_DB", reflect.String, "Y"); strings.ToUpper(useInMemoryDb.(string)) == "N" {
+		query := fmt.Sprintf(`INSERT INTO urls (original, shortened) VALUES ('%s', '%s')`, link, finalString[:8])
+		_, err := dbClient.Exec(context.Background(), query)
+		if err != nil {
+			return "", err
+		}
+	} else {
+		store[link] = finalString[:8]
+	}
+	return finalString[:8], nil
+
 }
 
-func ResolveShortenedLink(resolvable string) (string, error) {
-	for link, shortenedLink := range store {
-		if shortenedLink == resolvable {
-			return link, nil
+func ResolveShortenedLink(resolvable string, dbClient *pgxpool.Pool) (string, error) {
+	if useInMemoryDb := ReadEnvironmentVariable("USE_IN_MEMORY_DB", reflect.String, "Y"); strings.ToUpper(useInMemoryDb.(string)) == "N" {
+		query := fmt.Sprintf(`SELECT original FROM urls WHERE shortened = '%s'`, resolvable)
+		rows, err := dbClient.Query(context.Background(), query)
+		if err != nil {
+			return "", err
 		}
+		if rows != nil {
+			var original string
+			for rows.Next() {
+				err := rows.Scan(&original)
+				if err != nil {
+					return "", err
+				}
+			}
+			return original, nil
+		}
+		return "", nil
+	} else {
+		for link, shortenedLink := range store {
+			if shortenedLink == resolvable {
+				return link, nil
+			}
+		}
+		return "", errors.New("no entry found")
 	}
-	return "", errors.New("no entry found")
 }
