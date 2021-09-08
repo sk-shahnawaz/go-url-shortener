@@ -1,0 +1,107 @@
+{
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "URL shortener \u0026 resolver service written in Golang using Echo web framework",
+        "title": "go-url-shortener API",
+        "contact": {
+            "name": "Sk Shahnawaz-ul Haque"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:3355",
+    "basePath": "/api",
+    "paths": {
+        "/generate": {
+            "post": {
+                "description": "Generates shortened URL",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Generate"
+                ],
+                "summary": "Shortened URL generator",
+                "parameters": [
+                    {
+                        "description": "Input",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.Input"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/resolve": {
+            "get": {
+                "description": "Resolves the shortened URL and redirects to resolved URL",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "Resolve"
+                ],
+                "summary": "Shortened URL resolver",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "q is mandatory",
+                        "name": "q",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "308": {
+                        "description": "Permanent Redirect",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "dto.Input": {
+            "type": "object",
+            "properties": {
+                "url": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

@@ -11,13 +11,23 @@ import (
 	"reflect"
 	"strings"
 
+	_ "gourlshortener/web-api/docs"
+
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	log "github.com/sirupsen/logrus"
+	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
+// @title go-url-shortener API
+// @version 1.0
+// @description URL shortener & resolver service written in Golang using Echo web framework
+// @contact.name Sk Shahnawaz-ul Haque
+// @host localhost:3355
+// @BasePath /api
+// @schemes http https
 func main() {
 	var dbClient *pgxpool.Pool
 	var err error
@@ -86,5 +96,6 @@ func main() {
 		portNumber = portNumberInt.(int64)
 	}
 
+	app.GET("/swagger/*any", echoSwagger.WrapHandler)
 	app.Logger.Fatal(app.Start(fmt.Sprintf(":%d", portNumber)))
 }
