@@ -1,0 +1,70 @@
+basePath: /api
+definitions:
+  dto.Input:
+    properties:
+      url:
+        type: string
+    type: object
+host: localhost:3355
+info:
+  contact:
+    name: Sk Shahnawaz-ul Haque
+  description: URL shortener & resolver service written in Golang using Echo web framework
+  title: go-url-shortener API
+  version: "1.0"
+paths:
+  /generate:
+    post:
+      consumes:
+      - application/json
+      description: Generates shortened URL
+      parameters:
+      - description: Input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Input'
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Shortened URL generator
+      tags:
+      - Generate
+  /resolve:
+    get:
+      description: Resolves the shortened URL and redirects to resolved URL
+      parameters:
+      - description: q is mandatory
+        in: query
+        name: q
+        required: true
+        type: string
+      produces:
+      - text/html
+      responses:
+        "308":
+          description: Permanent Redirect
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Shortened URL resolver
+      tags:
+      - Resolve
+schemes:
+- http
+- https
+swagger: "2.0"

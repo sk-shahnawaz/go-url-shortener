@@ -14,6 +14,16 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// Shortened URL generator API godoc
+// @Summary Shortened URL generator
+// @Description Generates shortened URL
+// @Tags Generate
+// @accept json
+// @Param input body dto.Input true "Input"
+// @Success 200 {object} string
+// @Failure 404 {object} string
+// @Failure 500 {object} string
+// @Router /generate [post]
 func GenerateShortenedUrl(context echo.Context) error {
 	defer func() {
 		if r := recover(); r != nil {
@@ -33,7 +43,7 @@ func GenerateShortenedUrl(context echo.Context) error {
 		log.WithFields(log.Fields{
 			"status": http.StatusBadRequest,
 		}).Warn()
-		return context.JSON(http.StatusBadRequest, "Empty body.")
+		return context.String(http.StatusBadRequest, "Empty body.")
 	}
 	if log.GetLevel() == log.DebugLevel {
 		serializedByteContent, err := json.Marshal(context.Request().Body)
@@ -54,12 +64,12 @@ func GenerateShortenedUrl(context echo.Context) error {
 				"status":     http.StatusInternalServerError,
 				"stackTrace": string(err.Error()),
 			}).Error()
-			return context.JSON(http.StatusInternalServerError, "Error occurred while binding request body.")
+			return context.String(http.StatusInternalServerError, "Error occurred while binding request body.")
 		} else if input == nil {
 			log.WithFields(log.Fields{
 				"status": http.StatusBadRequest,
 			}).Error()
-			return context.JSON(http.StatusBadRequest, "Bad request received.")
+			return context.String(http.StatusBadRequest, "Bad request received.")
 		}
 	}
 	if err := input.Validate(); err != nil {
@@ -67,7 +77,7 @@ func GenerateShortenedUrl(context echo.Context) error {
 			"status":     http.StatusInternalServerError,
 			"stackTrace": string(err.Error()),
 		}).Error()
-		return context.JSON(http.StatusInternalServerError, err)
+		return context.String(http.StatusInternalServerError, err.Error())
 	}
 	shortnedLink, err := utilities.GenerateShortLink(input.Url, context.(models.ExtendedContext).Db)
 	if err != nil {
@@ -75,7 +85,7 @@ func GenerateShortenedUrl(context echo.Context) error {
 			"status":     http.StatusInternalServerError,
 			"stackTrace": string(err.Error()),
 		}).Error()
-		return context.JSON(http.StatusInternalServerError, "Error occurred shortening URL.")
+		return context.String(http.StatusInternalServerError, "Error occurred shortening URL.")
 	}
 	log.WithFields(log.Fields{
 		"status":       http.StatusOK,
@@ -85,6 +95,15 @@ func GenerateShortenedUrl(context echo.Context) error {
 	return context.String(http.StatusOK, fmt.Sprint("http://", context.Request().Host, "/api/resolve", "?q=", shortnedLink))
 }
 
+// Shortened URL resolver API godoc
+// @Summary Shortened URL resolver
+// @Description Resolves the shortened URL and redirects to resolved URL
+// @Tags Resolve
+// @param q query string true "q is mandatory"
+// @Produce  html
+// @Success 308 {object} string
+// @Failure 500 {object} string
+// @Router /resolve [get]
 func ResolveShortenedUrl(context echo.Context) error {
 	defer func() {
 		if r := recover(); r != nil {
@@ -106,7 +125,7 @@ func ResolveShortenedUrl(context echo.Context) error {
 			"status":  http.StatusBadRequest,
 			"message": err,
 		}).Error()
-		return context.JSON(http.StatusInternalServerError, "Query string missing.")
+		return context.String(http.StatusInternalServerError, "Query string missing.")
 	}
 	resolvedLink, err := utilities.ResolveShortenedLink(queryParameterValue, context.(models.ExtendedContext).Db)
 	if err != nil {
@@ -114,7 +133,7 @@ func ResolveShortenedUrl(context echo.Context) error {
 			"status":     http.StatusInternalServerError,
 			"stackTrace": string(err.Error()),
 		}).Error()
-		return context.JSON(http.StatusInternalServerError, "Error occurred resolving URL.")
+		return context.String(http.StatusInternalServerError, "Error occurred resolving URL.")
 	}
 	return context.Redirect(http.StatusPermanentRedirect, resolvedLink)
 }

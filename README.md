@@ -5,8 +5,11 @@
 - [Echo Web Framework](https://echo.labstack.com)
 - Visual Studio Code with appropriate extensions installed
 
-## TODO
-- HTTPS support
-- Add Open API Swagger Documentation 
+## Features
+- High performance, fast APIs with minimal resource foot print
+- Data persistence in PostgreSQL
+- Open API documentation support using Swagger
+
+## TODOs
 - Dockerization
 - GitHub actions
