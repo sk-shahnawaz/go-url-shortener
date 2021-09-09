@@ -9,7 +9,7 @@
 - High performance, fast APIs with minimal resource foot print
 - Data persistence in PostgreSQL
 - Open API documentation support using Swagger
+- GitHub actions
 
 ## TODOs
 - Dockerization
-- GitHub actions
