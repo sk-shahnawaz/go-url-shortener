@@ -1,0 +1,14 @@
+IaC:
+  - pulumi/**/*
+
+Documentation:
+  - any: ['./*.md', 'docs/*']
+
+Scripts:
+  - any: ['Scripts/**/*', './*.sh', './*.ps1']
+
+Configuration:
+  - any: ['./*.yml', './*.yaml', './.*']
+
+CI/CD:
+  - any: ['.github/workflows/*']

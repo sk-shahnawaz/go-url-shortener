@@ -1,0 +1,35 @@
+name: Build go-url-shortener
+
+on:
+  pull_request:
+    branches: 
+      - master
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+
+      - name: Set Up Go 1.x
+        uses: actions/setup-go@v2
+        with:
+          go-version: ^1.16
+        id: go
+
+      - name: Get Application Dependencies
+        run: |
+          go get -v -t -d ./...
+
+      - name: Test Application
+        run: |
+          go test ./...
+
+      - name: Build Application
+        run: |
+          cd web-api
+          go build
