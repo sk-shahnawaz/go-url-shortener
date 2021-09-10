@@ -13,10 +13,9 @@ Example:
 http://localhost:3355/
 ```
 ### Swagger API Documentation
-PROTOCOL://DOMAIN-or-IP:PORT/swagger/index.html
-Example:
 ```
 http://localhost:3355/swagger/index.html
+```
 
 ## API Endpoints
 - *Generator* /api/generate [POST]
