@@ -2,16 +2,17 @@ package main
 
 import (
 	"fmt"
-	"gourlshortener/db"
-	"gourlshortener/utilities"
-	"gourlshortener/web-api/handlers"
-	"gourlshortener/web-api/models"
 	"net/http"
 	"os"
 	"reflect"
+	"runtime/debug"
 	"strings"
 
-	_ "gourlshortener/web-api/docs"
+	"gourlshortener/src/Database"
+	"gourlshortener/src/Handlers"
+	"gourlshortener/src/Models"
+	"gourlshortener/src/Utilities"
+	_ "gourlshortener/src/docs"
 
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/joho/godotenv"
@@ -32,15 +33,21 @@ func main() {
 	var dbClient *pgxpool.Pool
 	var err error
 	defer func() {
+		if r := recover(); r != nil {
+			log.WithFields(log.Fields{
+				"error":   string(debug.Stack()),
+				"message": "main crashed",
+			})
+		}
 		if dbClient != nil {
-			db.Disconnect(dbClient)
+			Database.Disconnect(dbClient)
 		}
 	}()
 
 	godotenv.Load()
 	app := echo.New()
 
-	minimumLogLevel := utilities.ReadEnvironmentVariable("LOG_MINIMUM_LEVEL", reflect.String, "ERROR")
+	minimumLogLevel := Utilities.ReadEnvironmentVariable("LOG_MINIMUM_LEVEL", reflect.String, "ERROR")
 	func(minimumLogLevel string) {
 		logLevel, err := log.ParseLevel(minimumLogLevel)
 		if err != nil {
@@ -51,11 +58,11 @@ func main() {
 		log.SetOutput(os.Stdout)
 	}(fmt.Sprintf("%v", minimumLogLevel))
 
-	if useInMemoryDb := utilities.ReadEnvironmentVariable("USE_IN_MEMORY_DB", reflect.String, "Y"); strings.ToUpper(useInMemoryDb.(string)) == "N" {
-		dbClient, err = db.Connect()
+	if useInMemoryDb := Utilities.ReadEnvironmentVariable("USE_IN_MEMORY_DB", reflect.String, "Y"); strings.ToUpper(useInMemoryDb.(string)) == "N" {
+		dbClient, err = Database.Connect()
 		if err != nil {
 			log.Error("Failed to connect to database")
-			os.Exit(1)
+			panic("Failed to connect to database")
 		}
 	}
 
@@ -80,19 +87,19 @@ func main() {
 
 	apiGrouping.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			extendedContext := models.ExtendedContext{Context: c, Db: dbClient}
+			extendedContext := Models.ExtendedContext{Context: c, Db: dbClient}
 			return next(extendedContext)
 		}
 	})
 
-	linkGenerationRoute_Generator := apiGrouping.POST("/generate", handlers.GenerateShortenedUrl)
+	linkGenerationRoute_Generator := apiGrouping.POST("/generate", Handlers.GenerateShortenedUrl)
 	linkGenerationRoute_Generator.Name = "Generator"
 
-	linkGenerationRoute_Resolver := apiGrouping.GET("/resolve", handlers.ResolveShortenedUrl)
+	linkGenerationRoute_Resolver := apiGrouping.GET("/resolve", Handlers.ResolveShortenedUrl)
 	linkGenerationRoute_Resolver.Name = "Resolver"
 
 	var portNumber int64 = 80
-	if portNumberInt := utilities.ReadEnvironmentVariable("CUSTOM_PORT_NUMBER", reflect.Int32, "80"); portNumberInt.(int64) > 0 {
+	if portNumberInt := Utilities.ReadEnvironmentVariable("CUSTOM_PORT_NUMBER", reflect.Int32, "80"); portNumberInt.(int64) > 0 {
 		portNumber = portNumberInt.(int64)
 	}
 

@@ -1,25 +1,31 @@
-package handlers
+package Handlers
 
 import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"gourlshortener/utilities"
-	"gourlshortener/web-api/dto"
-	"gourlshortener/web-api/models"
+	"gourlshortener/src/Database"
+	"gourlshortener/src/Models"
+	"gourlshortener/src/Models/DTOs"
+	"gourlshortener/src/Utilities"
 	"net/http"
+	"reflect"
 	"runtime/debug"
+	"strings"
 
+	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/labstack/echo/v4"
 	log "github.com/sirupsen/logrus"
 )
+
+var store map[string]string = make(map[string]string)
 
 // Shortened URL generator API godoc
 // @Summary Shortened URL generator
 // @Description Generates shortened URL
 // @Tags Generate
 // @accept json
-// @Param input body dto.Input true "Input"
+// @Param input body DTOs.Input true "Input"
 // @Success 200 {object} string
 // @Failure 404 {object} string
 // @Failure 500 {object} string
@@ -57,7 +63,7 @@ func GenerateShortenedUrl(context echo.Context) error {
 			"body": string(serializedByteContent),
 		}).Debug()
 	}
-	input := new(dto.Input)
+	input := new(DTOs.Input)
 	if err := (&echo.DefaultBinder{}).BindBody(context, &input); input == nil || err != nil {
 		if err != nil {
 			log.WithFields(log.Fields{
@@ -79,7 +85,7 @@ func GenerateShortenedUrl(context echo.Context) error {
 		}).Error()
 		return context.String(http.StatusInternalServerError, err.Error())
 	}
-	shortnedLink, err := utilities.GenerateShortLink(input.Url, context.(models.ExtendedContext).Db)
+	shortnedLink, err := Utilities.GenerateShortLink(input.Url)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"status":     http.StatusInternalServerError,
@@ -87,6 +93,15 @@ func GenerateShortenedUrl(context echo.Context) error {
 		}).Error()
 		return context.String(http.StatusInternalServerError, "Error occurred shortening URL.")
 	}
+	go func() {
+		if useInMemoryDb := Utilities.ReadEnvironmentVariable("USE_IN_MEMORY_DB", reflect.String, "Y"); strings.ToUpper(useInMemoryDb.(string)) == "N" {
+			err = Database.PerformDatabaseInsert(context.(Models.ExtendedContext).Db, input.Url, shortnedLink)
+		} else {
+			if _, present := store[input.Url]; !present {
+				store[input.Url] = shortnedLink
+			}
+		}
+	}()
 	log.WithFields(log.Fields{
 		"status":       http.StatusOK,
 		"originalUrl":  input.Url,
@@ -120,14 +135,14 @@ func ResolveShortenedUrl(context echo.Context) error {
 		"name":   "Resolve Shortened URL",
 	}).Info()
 	queryParameterValue := context.QueryParam("q")
-	if err := dto.Validate(queryParameterValue); err != nil {
+	if err := DTOs.Validate(queryParameterValue); err != nil {
 		log.WithFields(log.Fields{
 			"status":  http.StatusBadRequest,
 			"message": err,
 		}).Error()
 		return context.String(http.StatusInternalServerError, "Query string missing.")
 	}
-	resolvedLink, err := utilities.ResolveShortenedLink(queryParameterValue, context.(models.ExtendedContext).Db)
+	resolvedLink, err := resolveShortenedLink(context.(Models.ExtendedContext).Db, queryParameterValue)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"status":     http.StatusInternalServerError,
@@ -136,4 +151,17 @@ func ResolveShortenedUrl(context echo.Context) error {
 		return context.String(http.StatusInternalServerError, "Error occurred resolving URL.")
 	}
 	return context.Redirect(http.StatusPermanentRedirect, resolvedLink)
+}
+
+func resolveShortenedLink(dbClient *pgxpool.Pool, resolvable string) (string, error) {
+	if useInMemoryDb := Utilities.ReadEnvironmentVariable("USE_IN_MEMORY_DB", reflect.String, "Y"); strings.ToUpper(useInMemoryDb.(string)) == "N" {
+		return Database.PerformDatabaseSelect(dbClient, resolvable)
+	} else {
+		for link, shortenedLink := range store {
+			if shortenedLink == resolvable {
+				return link, nil
+			}
+		}
+		return "", errors.New("no entry found")
+	}
 }
