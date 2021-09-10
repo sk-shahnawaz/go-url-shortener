@@ -42,7 +42,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.Input"
+                            "$ref": "#/definitions/DTOs.Input"
                         }
                     }
                 ],
@@ -105,7 +105,7 @@ var doc = `{
         }
     },
     "definitions": {
-        "dto.Input": {
+        "DTOs.Input": {
             "type": "object",
             "properties": {
                 "url": {

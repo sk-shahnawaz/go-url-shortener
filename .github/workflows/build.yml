@@ -31,5 +31,5 @@ jobs:
 
       - name: Build Application
         run: |
-          cd web-api
+          cd src
           go build

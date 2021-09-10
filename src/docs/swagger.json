@@ -32,7 +32,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.Input"
+                            "$ref": "#/definitions/DTOs.Input"
                         }
                     }
                 ],
@@ -95,7 +95,7 @@
         }
     },
     "definitions": {
-        "dto.Input": {
+        "DTOs.Input": {
             "type": "object",
             "properties": {
                 "url": {
