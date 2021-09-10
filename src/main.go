@@ -37,7 +37,7 @@ func main() {
 			log.WithFields(log.Fields{
 				"error":   string(debug.Stack()),
 				"message": "main crashed",
-			})
+			}).Error()
 		}
 		if dbClient != nil {
 			Database.Disconnect(dbClient)
