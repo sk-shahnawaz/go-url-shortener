@@ -7,8 +7,6 @@
 - PostgreSQL v13+
 
 ### Health Check Endpoint
-PROTOCOL://DOMAIN-or-IP:PORT/ 
-Example:
 ```
 http://localhost:3355/
 ```
@@ -16,14 +14,13 @@ http://localhost:3355/
 ```
 http://localhost:3355/swagger/index.html
 ```
-
 ## API Endpoints
 - *Generator* /api/generate [POST]
 - *Resolver* /api/resolve [GET]
 
 ## Environment Variables
-+-------+---------+
 | Name  | Meaning |
+|-------|---------|
 | LOG_MINIMUM_LEVEL | Minimum logging level |
 | CUSTOM_PORT_NUMBER | Server port binding |
 | USE_IN_MEMORY_DB | [Y/N] Y to use in-memory database, N to use PostgreSQL |
