@@ -92,11 +92,11 @@ func main() {
 		}
 	})
 
-	linkGenerationRoute_Generator := apiGrouping.POST("/generate", Handlers.GenerateShortenedUrl)
-	linkGenerationRoute_Generator.Name = "Generator"
+	linkGeneratorRoute := apiGrouping.POST("/generate", Handlers.GenerateShortenedUrl)
+	linkGeneratorRoute.Name = "Generator"
 
-	linkGenerationRoute_Resolver := apiGrouping.GET("/resolve", Handlers.ResolveShortenedUrl)
-	linkGenerationRoute_Resolver.Name = "Resolver"
+	linkResolverRoute := apiGrouping.GET("/resolve", Handlers.ResolveShortenedUrl)
+	linkResolverRoute.Name = "Resolver"
 
 	var portNumber int64 = 80
 	if portNumberInt := Utilities.ReadEnvironmentVariable("CUSTOM_PORT_NUMBER", reflect.Int32, "80"); portNumberInt.(int64) > 0 {

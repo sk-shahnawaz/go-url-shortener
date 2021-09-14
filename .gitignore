@@ -7,5 +7,5 @@
 __pycache__/
 venv/
 .env
-.vscode/launch.json
+!.vscode/launch.json
 !.env
