@@ -10,13 +10,15 @@
 ```
 http://localhost:3355/
 ```
-### Swagger API Documentation
+### Swagger API Documentation Available At
 ```
 http://localhost:3355/swagger/index.html
 ```
 ## API Endpoints
-- *Generator* /api/generate [POST]
-- *Resolver* /api/resolve [GET]
+| Name  | Path | Method |
+|-------|------|--------|
+| Generator | */api/generate* | **POST** |
+| Resolver | */api/resolve* | **GET** |
 
 ## Environment Variables
 | Name  | Meaning |
@@ -31,13 +33,22 @@ http://localhost:3355/swagger/index.html
 | POSTGRES_DATABASE | PostgreSQL database name |
 | POSTGRES_SSL_MODE | PostgreSQL SSL mode info, keep blank if SSL is not enabled |
 
+## Performing Database Migration
+### Creating New Database Migration
+```powershell
+cd go-url-shortener\src
+go run Database\Migrations\main.go create <NAME_OF_MIGRATION>
+```
+After this a new `Go` file will be generated at `Database\Migrations` directory with the name: `<TIMESTAMP>_<NAME_OF_MIGRATION>`, Update the created file with `up` & `down` scripts.
+### Running Database Migration
+Select the configuration named: `Database Migration` and start Run the application.
 ## Highlights
 - High performance, fast APIs with minimal resource foot print
 - Data persistence in PostgreSQL
+- PostgreSQL database migrations
 - Open API documentation support using Swagger
 - GitHub actions
 
 ## TODOs
 - HTTPS support / redirection
-- PostgreSQL database migration
 - Dockerization

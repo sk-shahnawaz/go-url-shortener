@@ -11,12 +11,15 @@ require (
 	github.com/go-openapi/swag v0.19.15 // indirect
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
+	github.com/go-pg/migrations/v8 v8.1.0 // indirect
+	github.com/go-pg/pg/v9 v9.2.1 // indirect
 	github.com/itchyny/base58-go v0.1.0
 	github.com/jackc/pgx/v4 v4.13.0
 	github.com/joho/godotenv v1.3.0
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/echo/v4 v4.5.0
 	github.com/mailru/easyjson v0.7.7 // indirect
+	github.com/robinjoseph08/go-pg-migrations/v2 v2.1.0 // indirect
 	github.com/sirupsen/logrus v1.8.1
 	github.com/swaggo/echo-swagger v1.1.3
 	github.com/swaggo/files v0.0.0-20210815190702-a29dd2bc99b2 // indirect
