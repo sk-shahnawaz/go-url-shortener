@@ -46,7 +46,7 @@ Select the configuration named: `Database Migration` and `Run` the application f
 =======
 After this a new `Go` file will be generated at `Database\Migrations` directory with the name: `<TIMESTAMP>_<NAME_OF_MIGRATION>`, Update the created file with `up` & `down` scripts.
 ### Running Database Migration
-Select the configuration named: Database Migration and start Run the application in VS Code.
+Select the configuration named: **Database Migration** and start Run the application in VS Code.
 
 ## Highlights
 - High performance, fast APIs with minimal resource foot print
