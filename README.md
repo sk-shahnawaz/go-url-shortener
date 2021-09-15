@@ -5,6 +5,8 @@
 - [Echo Web Framework](https://echo.labstack.com)
 - Visual Studio Code with Go extension installed globally
 - PostgreSQL v13+
+- Docker v20.10.6 build 370c289 or above
+- Docker Compose v3.7+ 
 
 ### Health Check Endpoint
 ```
@@ -17,8 +19,8 @@ http://localhost:3355/swagger/index.html
 ## API Endpoints
 | Name  | Path | Method |
 |-------|------|--------|
-| Generator | */api/generate* | **POST** |
-| Resolver | */api/resolve* | **GET** |
+| Generator | /api/generate | **POST** |
+| Resolver | /api/resolve | **GET** |
 
 ## Environment Variables
 | Name  | Meaning |
@@ -33,6 +35,14 @@ http://localhost:3355/swagger/index.html
 | POSTGRES_DATABASE | PostgreSQL database name |
 | POSTGRES_SSL_MODE | PostgreSQL SSL mode info, keep blank if SSL is not enabled |
 
+## Open API Swagger Documentation Generation / Updation
+First, add / edit inline documentation comments. After this follow:
+```powershell
+cd go-url-shortener\src
+swag init
+```
+This will generate/re-generate documentation artifacts inside `go-url-shortener\src\docs` directory.
+
 ## Performing Database Migration
 ### Creating New Database Migration
 ```powershell
@@ -43,7 +53,7 @@ After this a new `Go` file will be generated at `Database\Migrations` directory 
 ### Running Database Migration
 Select the configuration named: **Database Migration** and start running the application in VS Code.
 
-## Highlights
+## Features
 - High performance, fast APIs with minimal resource foot print
 - Data persistence in PostgreSQL
 - PostgreSQL database migrations

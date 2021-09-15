@@ -24,11 +24,13 @@ import (
 
 // @title go-url-shortener API
 // @version 1.0
-// @description URL shortener & resolver service written in Golang using Echo web framework
+// @description URL shortener & resolver Web API app written in Go using Echo Web Framework
 // @contact.name Sk Shahnawaz-ul Haque
 // @host localhost:3355
+// @license.name MIT
+// @license.url https://github.com/Shahnawaz-QI/go-url-shortener/blob/master/LICENSE
 // @BasePath /api
-// @schemes http https
+// @schemes http
 func main() {
 	var dbClient *pgxpool.Pool
 	var err error
@@ -80,7 +82,7 @@ func main() {
 			"name":   "Health",
 			"status": http.StatusOK,
 		}).Debug()
-		return context.String(http.StatusOK, "Server up & running.")
+		return context.String(http.StatusOK, "Healthy")
 	}).Name = "Health"
 
 	apiGrouping := app.Group("/api")
