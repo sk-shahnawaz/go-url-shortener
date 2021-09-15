@@ -1,14 +1,17 @@
 {
     "schemes": [
-        "http",
-        "https"
+        "http"
     ],
     "swagger": "2.0",
     "info": {
-        "description": "URL shortener \u0026 resolver service written in Golang using Echo web framework",
+        "description": "URL shortener \u0026 resolver Web API app written in Go using Echo Web Framework",
         "title": "go-url-shortener API",
         "contact": {
             "name": "Sk Shahnawaz-ul Haque"
+        },
+        "license": {
+            "name": "MIT",
+            "url": "https://github.com/Shahnawaz-QI/go-url-shortener/blob/master/LICENSE"
         },
         "version": "1.0"
     },

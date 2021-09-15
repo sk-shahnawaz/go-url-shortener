@@ -9,7 +9,10 @@ host: localhost:3355
 info:
   contact:
     name: Sk Shahnawaz-ul Haque
-  description: URL shortener & resolver service written in Golang using Echo web framework
+  description: URL shortener & resolver Web API app written in Go using Echo Web Framework
+  license:
+    name: MIT
+    url: https://github.com/Shahnawaz-QI/go-url-shortener/blob/master/LICENSE
   title: go-url-shortener API
   version: "1.0"
 paths:
@@ -66,5 +69,4 @@ paths:
       - Resolve
 schemes:
 - http
-- https
 swagger: "2.0"

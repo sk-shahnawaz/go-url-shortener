@@ -20,6 +20,10 @@ var doc = `{
         "contact": {
             "name": "Sk Shahnawaz-ul Haque"
         },
+        "license": {
+            "name": "MIT",
+            "url": "https://github.com/Shahnawaz-QI/go-url-shortener/blob/master/LICENSE"
+        },
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
@@ -130,9 +134,9 @@ var SwaggerInfo = swaggerInfo{
 	Version:     "1.0",
 	Host:        "localhost:3355",
 	BasePath:    "/api",
-	Schemes:     []string{"http", "https"},
+	Schemes:     []string{"http"},
 	Title:       "go-url-shortener API",
-	Description: "URL shortener & resolver service written in Golang using Echo web framework",
+	Description: "URL shortener & resolver Web API app written in Go using Echo Web Framework",
 }
 
 type s struct{}
