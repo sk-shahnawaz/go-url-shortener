@@ -35,8 +35,15 @@ http://localhost:3355/swagger/index.html
 | POSTGRES_DATABASE | PostgreSQL database name |
 | POSTGRES_SSL_MODE | PostgreSQL SSL mode info, keep blank if SSL is not enabled |
 
+## Features
+- High performance, fast APIs with minimal resource foot print
+- Data persistence in PostgreSQL
+- PostgreSQL database migrations
+- Open API documentation support using Swagger
+- GitHub actions
+
 ## Open API Swagger Documentation Generation / Updation
-First, add / edit inline documentation comments. After this follow:
+First, add / edit inline documentation comments following [Declarative Comments Format](https://github.com/swaggo/swag#declarative-comments-format). After this follow:
 ```powershell
 cd go-url-shortener\src
 swag init
@@ -49,17 +56,11 @@ This will generate/re-generate documentation artifacts inside `go-url-shortener\
 cd go-url-shortener\src
 go run Database\Migrations\main.go create <NAME_OF_MIGRATION>
 ```
-After this a new `Go` file will be generated at `Database\Migrations` directory with the name: `<TIMESTAMP>_<NAME_OF_MIGRATION>`, Update the created file with `up` & `down` scripts.
-### Running Database Migration
-Select the configuration named: **Database Migration** and start running the application in VS Code.
 
-## Features
-- High performance, fast APIs with minimal resource foot print
-- Data persistence in PostgreSQL
-- PostgreSQL database migrations
-- Open API documentation support using Swagger
-- GitHub actions
+After this a new `Go` file will be generated at `Database\Migrations` directory with the name: `<TIMESTAMP>_<NAME_OF_MIGRATION>`, Update the created file with `up` & `down` scripts.
+
+### Running Database Migration
+Update the environment variables of .env file as per configuration requirement, select the configuration named: **Database Migration**, and start running the application in VS Code.
 
 ## TODOs
 - HTTPS support / redirection
-- Dockerization
