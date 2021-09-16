@@ -1,0 +1,51 @@
+version: "3.7"
+services:
+  go_url_shortener:
+    container_name: go_url_shortener
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    depends_on:
+      - 'postgres'
+    environment:
+      ENV: local
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DATABASE: gourlshortenerdb
+      USE_IN_MEMORY_DB: N
+      LOG_MINIMUM_LEVEL: information
+      CUSTOM_PORT_NUMBER: 3356  
+    ports:
+      - 3356:3356
+    networks:
+      - gourlshortenerclusternetwork 
+  # migration:
+  #   container_name: db-migration
+  #   build:
+  #     context: .
+  #     dockerfile: ./src/Database/Dockerfile
+  #   depends_on:
+  #     - 'postgres'
+  postgres:
+      container_name: postgres-db
+      image: "postgres:latest"
+      restart: always
+      ports:
+        - "9191:5432"
+      environment:
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: postgres
+        POSTGRES_DB: gourlshortenerdb
+      networks: 
+        - gourlshortenerclusternetwork
+      volumes:
+        - gourlshortenerclustervolume:/var/lib/postgres
+  
+networks:
+  gourlshortenerclusternetwork:
+    driver: bridge
+        
+volumes:
+  gourlshortenerclustervolume:   
